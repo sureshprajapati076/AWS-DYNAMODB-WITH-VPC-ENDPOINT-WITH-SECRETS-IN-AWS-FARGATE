@@ -1,0 +1,3 @@
+# AWS-DYNAMODB-WITH-VPC-ENDPOINT-WITH-SECRETS-IN-AWS-FARGATE
+
+https://www.youtube.com/watch?v=AuUaZKd570k
