@@ -34,35 +34,17 @@ public class DynamodbConfig {
 
         AmazonDynamoDB amazonDynamoDB=amazonDynamoDBConfig();
 
-        DynamoDB dynamoDB = new DynamoDB(amazonDynamoDB);
 
-        String tableName = "person";
+        createTable("person","personId",amazonDynamoDB);
 
-        try {
-            System.out.println("Checking if table "+ tableName+" already existed...");
-            Table checkTable=dynamoDB.getTable(tableName);
-            checkTable.describe();
-            System.out.println("Table "+checkTable.getTableName()+ " already exists...");
-        }
-        catch (ResourceNotFoundException resourceNotFoundException) {
-            System.out.println(tableName+ " does not exist.");
-            System.out.println("Attempting to create table; please wait...");
-            try {
-                Table table = dynamoDB.createTable(tableName,
-                        Arrays.asList(new KeySchemaElement("personId", KeyType.HASH)), // Partition key
-                        Arrays.asList(new AttributeDefinition("personId", ScalarAttributeType.S)),
-                                      new ProvisionedThroughput(10L, 10L));
-                table.waitForActive();
-                System.out.println("Success.  Table status: " + table.getDescription().getTableStatus());
-            }
-            catch (Exception e){
-                System.err.println("Unable to create table: ");
-                System.err.println(e.getMessage());
-            }
+        /*
+            COMMENT OUT createTable("person","personId",amazonDynamoDB); if auto-table creation in
+            AWS-FARGATE IS NOT WORKING.
+            THIS IS TESTED AND WORKED IN LOCAL MACHINE...
+         */
 
 
 
-        }
 
         return new DynamoDBMapper(amazonDynamoDB);
 
@@ -74,4 +56,35 @@ public class DynamodbConfig {
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(SERVICE_ENDPOINT, REGION))
                 .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(ACCESS_KEY, SECRET_KEY))).build();
     }
+
+    private void createTable(String tableName, String partitionKeyName, AmazonDynamoDB client){
+        DynamoDB dynamoDB = new DynamoDB(client);
+        try {
+            System.out.println("Checking if table "+ tableName+" already existed...");
+            Table checkTable=dynamoDB.getTable(tableName);
+            checkTable.describe();
+            System.out.println("Table "+checkTable.getTableName()+ " already exists...");
+        }
+        catch (ResourceNotFoundException resourceNotFoundException) {
+            System.out.println(tableName+ " does not exist.");
+            System.out.println("Attempting to create table; please wait...");
+            try {
+                Table table = dynamoDB.createTable(tableName,
+                        Arrays.asList(new KeySchemaElement(partitionKeyName, KeyType.HASH)), // Partition key
+                        Arrays.asList(new AttributeDefinition(partitionKeyName, ScalarAttributeType.S)),
+                        new ProvisionedThroughput(10L, 10L));
+                table.waitForActive();
+                System.out.println("Success.  Table status: " + table.getDescription().getTableStatus());
+            }
+            catch (Exception e){
+                System.err.println("Unable to create table: ");
+                System.err.println(e.getMessage());
+            }
+
+
+
+        }
+    }
+
+
 }
