@@ -2,6 +2,8 @@
 
 Table will be auto created during boot up. [See](https://github.com/sureshprajapati076/AWS-DYNAMODB-WITH-VPC-ENDPOINT-WITH-SECRETS-IN-AWS-FARGATE/blob/master/src/main/java/com/prajapati/dynamodb/config/DynamodbConfig.java)
 
+https://www.youtube.com/watch?v=4ZpeV7VXccA
+
 https://www.youtube.com/watch?v=AuUaZKd570k
 
 ```json
