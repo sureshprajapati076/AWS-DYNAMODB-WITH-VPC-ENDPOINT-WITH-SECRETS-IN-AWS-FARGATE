@@ -6,9 +6,14 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.model.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.amazonaws.services.dynamodbv2.document.Table;
+
+import java.util.Arrays;
 
 @Configuration
 public class DynamodbConfig {
@@ -26,7 +31,42 @@ public class DynamodbConfig {
 
     @Bean
     public DynamoDBMapper mapper() {
-        return new DynamoDBMapper(amazonDynamoDBConfig());
+
+        AmazonDynamoDB amazonDynamoDB=amazonDynamoDBConfig();
+
+        DynamoDB dynamoDB = new DynamoDB(amazonDynamoDB);
+
+        String tableName = "person";
+
+        try {
+            System.out.println("Checking if table "+ tableName+" already existed...");
+            Table checkTable=dynamoDB.getTable(tableName);
+            checkTable.describe();
+            System.out.println("Table "+checkTable.getTableName()+ " already exists...");
+        }
+        catch (ResourceNotFoundException resourceNotFoundException) {
+            System.out.println(tableName+ " does not exist.");
+            System.out.println("Attempting to create table; please wait...");
+            try {
+                Table table = dynamoDB.createTable(tableName,
+                        Arrays.asList(new KeySchemaElement("personId", KeyType.HASH)), // Partition key
+                        Arrays.asList(new AttributeDefinition("personId", ScalarAttributeType.S)),
+                                      new ProvisionedThroughput(10L, 10L));
+                table.waitForActive();
+                System.out.println("Success.  Table status: " + table.getDescription().getTableStatus());
+            }
+            catch (Exception e){
+                System.err.println("Unable to create table: ");
+                System.err.println(e.getMessage());
+            }
+
+
+
+        }
+
+        return new DynamoDBMapper(amazonDynamoDB);
+
+
     }
 
     private AmazonDynamoDB amazonDynamoDBConfig() {
