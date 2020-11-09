@@ -20,3 +20,5 @@ https://www.youtube.com/watch?v=AuUaZKd570k
     ]
 }
 ```
+
+For parameter Read: arn:aws:ssm:<region>:<account-id>:parameter/<parameter-name>
