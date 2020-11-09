@@ -27,28 +27,11 @@ public class DynamodbConfig {
     @Value("${SECRET_KEY:default}")
     String SECRET_KEY;
 
-
-
     @Bean
     public DynamoDBMapper mapper() {
-
         AmazonDynamoDB amazonDynamoDB=amazonDynamoDBConfig();
-
-
         createTable("person","personId",amazonDynamoDB);
-
-        /*
-            COMMENT OUT createTable("person","personId",amazonDynamoDB); if auto-table creation in
-            AWS-FARGATE IS NOT WORKING.
-            THIS IS TESTED AND WORKED IN LOCAL MACHINE...
-         */
-
-
-
-
         return new DynamoDBMapper(amazonDynamoDB);
-
-
     }
 
     private AmazonDynamoDB amazonDynamoDBConfig() {
@@ -61,9 +44,8 @@ public class DynamodbConfig {
         DynamoDB dynamoDB = new DynamoDB(client);
         try {
             System.out.println("Checking if table "+ tableName+" already existed...");
-            Table checkTable=dynamoDB.getTable(tableName);
-            checkTable.describe();
-            System.out.println("Table "+checkTable.getTableName()+ " already exists...");
+            dynamoDB.getTable(tableName).describe();
+            System.out.println("Table "+tableName+ " already exists...");
         }
         catch (ResourceNotFoundException resourceNotFoundException) {
             System.out.println(tableName+ " does not exist.");
@@ -80,11 +62,6 @@ public class DynamodbConfig {
                 System.err.println("Unable to create table: ");
                 System.err.println(e.getMessage());
             }
-
-
-
         }
     }
-
-
 }

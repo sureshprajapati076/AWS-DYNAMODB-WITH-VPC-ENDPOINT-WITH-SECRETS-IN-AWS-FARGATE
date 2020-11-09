@@ -24,3 +24,8 @@ For parameter Read:
 ```sh
 arn:aws:ssm:<region>:<account-id>:parameter/<parameter-name>
 ```
+
+For ECR login:
+```shell script
+$(aws ecr get-login --no-include-email --region us-east-1)
+```
