@@ -6,6 +6,7 @@ https://www.youtube.com/watch?v=AuUaZKd570k
 
 ```json
 {
+    "Version": "2012-10-17",
     "Statement": [
         {
             "Action": "dynamodb:*",
